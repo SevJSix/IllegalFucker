@@ -21,12 +21,14 @@ public class ItemUtil {
             Item.getById(211), //Chain Command Block
             Item.getById(210), //Repeating Command Block
             Item.getById(137), //Command Block
-            Item.getById(422) //Command Block Minecart
+            Item.getById(422), //Command Block Minecart
+            Item.getById(60), //Farm Land
+            Item.getById(208) //Grass Path
     );
 
     public static boolean isIllegal(ItemStack item) {
         if (item == null) return false;
-        return isOverstacked(item) || isUnobtainableItem(item);
+        return isOverstacked(item) || isUnobtainableItem(item) || hasAttributes(item) || hasIllegalBlockEntityTag(item);
     }
 
     public static boolean isOverstacked(ItemStack item) {
@@ -35,5 +37,13 @@ public class ItemUtil {
 
     public static boolean isUnobtainableItem(ItemStack item) {
         return illegals.contains(item.getItem());
+    }
+
+    public static boolean hasAttributes(ItemStack item) {
+        return item.hasTag() && item.getTag().hasKey("AttributeModifiers");
+    }
+
+    public static boolean hasIllegalBlockEntityTag(ItemStack item) {
+        return !item.getItem().getName().contains("shulker_box") && item.hasTag() && item.getTag().hasKey("BlockEntityTag");
     }
 }
