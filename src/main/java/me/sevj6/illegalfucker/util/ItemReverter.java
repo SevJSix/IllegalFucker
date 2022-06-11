@@ -126,17 +126,28 @@ public class ItemReverter {
     private static boolean containsEnchantment(NBTTagList ench, int id) {
         return ench.list.stream().map(t -> (NBTTagCompound)t).anyMatch(c -> id == c.getShort("id"));
     }
+    private static void removeEnchantment(NBTTagList ench, int id) {
+        ench.list.stream().map(t -> (NBTTagCompound)t).filter(tag -> tag.getShort("id") == id).forEach(ench.list::remove);
+    }
 
     public static void removeConflicting(ItemStack itemStack) {
         if (!ItemUtil.hasTag(itemStack)) return;
         if (!itemStack.hasEnchantments()) return;
         NBTTagList enchants = itemStack.getTag().getList("ench", 10);
+        for (int i = 0; i < enchants.size(); i++) {
+            NBTTagCompound compound = enchants.get(i);
+            Enchantment key = Enchantment.c(compound.getShort("id"));
+            if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, 17)) {
+                removeEnchantment(enchants, 17);
+            }
+            if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, 18)) {
+                removeEnchantment(enchants, 18);
+
+            }
+        }
         for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
             Enchantment key = entry.getKey();
-            if (key.equals(Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(Enchantment.DAMAGE_UNDEAD))
-                itemStack.removeEnchantment(Enchantment.DAMAGE_UNDEAD);
-            if (key.equals(Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS))
-                itemStack.removeEnchantment(Enchantment.DAMAGE_ARTHROPODS);
+
             if (key.equals(Enchantment.DAMAGE_UNDEAD) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS))
                 itemStack.removeEnchantment(Enchantment.DAMAGE_ARTHROPODS);
             if (key.equals(Enchantment.MENDING) && itemStack.containsEnchantment(Enchantment.ARROW_INFINITE))
@@ -169,6 +180,6 @@ public class ItemReverter {
     }
 
     public static boolean isBoots(ItemStack itemStack) {
-        return itemStack.getItem().getName().contains("_BOOTS");
+        return itemStack.getItem().getName().contains("_boots");
     }
 }
