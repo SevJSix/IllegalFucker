@@ -65,7 +65,7 @@ public class ItemReverter {
             NBTTagCompound display = itemStack.getTag().getCompound("display");
             String name = display.getString("Name");
             if (ChatColor.stripColor(name).length() != name.length()) name = ChatColor.stripColor(name);
-            if (name.length() > 16) name = name.substring(0, 16);
+            if (name.length() > 30) name = name.substring(0, 30);
             display.setString("Name", name);
         }
         if (ItemUtil.hasIllegalFlightDuration(itemStack)) {

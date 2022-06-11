@@ -1,6 +1,7 @@
 package me.sevj6.illegalfucker;
 
 import me.sevj6.illegalfucker.listener.ItemStackCreateListener;
+import me.sevj6.illegalfucker.listener.TileEntityCreateListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -16,6 +17,7 @@ public final class IllegalFucker extends JavaPlugin {
         instance = this;
         getLogger().addHandler(new LoggerHandler());
         Bukkit.getPluginManager().registerEvents(new ItemStackCreateListener(), this);
+        Bukkit.getPluginManager().registerEvents(new TileEntityCreateListener(), this);
     }
 
     @Override
