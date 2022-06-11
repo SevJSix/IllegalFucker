@@ -1,9 +1,7 @@
 package me.sevj6.illegalfucker.util;
 
-import net.minecraft.server.v1_12_R1.Enchantment;
-import net.minecraft.server.v1_12_R1.ItemStack;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
-import net.minecraft.server.v1_12_R1.NBTTagList;
+import net.minecraft.server.v1_12_R1.*;
+import org.bukkit.ChatColor;
 
 /**
  * @author 254n_m
@@ -13,8 +11,8 @@ import net.minecraft.server.v1_12_R1.NBTTagList;
 public class ItemReverter {
     public static void revert(ItemStack itemStack) {
         if (ItemUtil.isUnobtainableItem(itemStack)) {
-            itemStack.setCount(-1);
             Utils.log("&3Deleted a &r&a%s&3 because it was unobtainable", Utils.formatItem(itemStack));
+            itemStack.setCount(-1);
         }
         if (ItemUtil.isOverstacked(itemStack)) {
             Utils.log("&aReverted a &r&a%s&3 because it was overstacked", Utils.formatItem(itemStack));
@@ -30,30 +28,62 @@ public class ItemReverter {
             tagCompound.remove("AttributeModifiers");
             itemStack.setTag(tagCompound);
         }
-        if (ItemUtil.hasIllegalEnchants(itemStack)) {
-            NBTTagCompound itemTag = (NBTTagCompound) itemStack.getTag().clone();
-            NBTTagList enchants = (NBTTagList) itemTag.map.get("ench");
-            for (int i = 0; i < enchants.size(); i++) {
-                try {
-                    NBTTagCompound compound = enchants.get(i);
-                    short level = compound.getShort("lvl");
-                    Enchantment enchantment = Enchantment.c(compound.getShort("id"));
-                    if (level > enchantment.getMaxLevel()) {
-                        compound.setShort("lvl", (short) enchantment.getMaxLevel());
-                        Utils.log("&3Reverted enchant&r&a %s&r&3 from level&r&a %d&r&3 to&r&a %d&r", enchantment.a(), level, enchantment.getMaxLevel());
-                    }
-                    if (!enchantment.canEnchant(itemStack)) {
-                        enchants.remove(i);
-                        Utils.log("&3Removing enchant&r&a %s&r&3 because it could not enchant&r&a %s&r", enchantment.a(), Utils.formatItem(itemStack));
-                    }
-                } catch (Throwable t) {
-                    t.printStackTrace();
+        if (ItemUtil.cantBeEnchanted(itemStack)) {
+            if (itemStack.hasTag()) {
+                NBTTagCompound tag = itemStack.getTag();
+                if (tag.hasKey("ench")) {
+                    tag.remove("ench");
+                    Utils.log("&3Removed all enchantments from item %s", Utils.formatItem(itemStack));
                 }
             }
-            if (enchants.size() > 0) {
-                itemTag.set("ench", enchants);
-            } else itemTag.remove("ench");
-            itemStack.setTag(itemTag);
+        }
+        if (ItemUtil.hasIllegalEnchants(itemStack)) {
+            revertEnchantLevels(itemStack);
+        }
+        if (ItemUtil.hasCustomPotionEffects(itemStack)) {
+            itemStack.getTag().remove("CustomPotionEffects");
+            Utils.log("&3Removed all custom potion effects from %s", Utils.formatItem(itemStack));
+        }
+        if (ItemUtil.hasMeta(itemStack)) {
+            NBTTagCompound display = itemStack.getTag().getCompound("display");
+            display.remove("Lore");
+            Utils.log("&3Removed lore form %s", Utils.formatItem(itemStack));
+        }
+        if (ItemUtil.isUnbreakable(itemStack)) {
+            itemStack.getTag().remove("Unbreakable");
+            Utils.log("&3Removed the Unbreakable tag from item %s", Utils.formatItem(itemStack));
+        }
+        if (ItemUtil.hasHideFlags(itemStack)) {
+            itemStack.getTag().remove("HideFlags");
+            Utils.log("&3Removed the HideFlags tag from item %s", Utils.formatItem(itemStack));
+        }
+        if (ItemUtil.hasInvalidBlockEntityTag(itemStack)) {
+            itemStack.getTag().remove("BlockEntityTag");
+            Utils.log("&3Removed the BlockEntityTag tag from item %s", Utils.formatItem(itemStack));
+        }
+        if (ItemUtil.hasInvalidName(itemStack)) {
+            NBTTagCompound display = itemStack.getTag().getCompound("display");
+            String name = display.getString("Name");
+            if (ChatColor.stripColor(name).length() != name.length()) name = ChatColor.stripColor(name);
+            if (name.length() > 16) name = name.substring(0, 16);
+            display.setString("Name", name);
+        }
+    }
+
+    private static void revertEnchantLevels(ItemStack itemStack) {
+        NBTTagList enchants = itemStack.getEnchantments();
+        for (int i = 0; i < enchants.size(); i++) {
+            NBTTagCompound compound = enchants.get(i);
+            short level = compound.getShort("lvl");
+            Enchantment enchantment = Enchantment.c(compound.getShort("id"));
+            if (level > enchantment.getMaxLevel()) {
+                compound.setShort("lvl", (short) enchantment.getMaxLevel());
+                Utils.log("&3Reverted enchant&r&a %s&r&3 from level&r&a %d&r&3 to&r&a %d&r", enchantment.a(), level, enchantment.getMaxLevel());
+            }
+//            if (!ItemUtil.canEnchant(itemStack, enchantment)) {
+//                enchants.remove(i);
+//                Utils.log("&3Removing enchant&r&a %s&r&3 because it could not enchant %s", enchantment.a(), Utils.formatItem(itemStack));
+//            }
         }
     }
 }

@@ -1,11 +1,15 @@
 package me.sevj6.illegalfucker.util;
 
 import net.minecraft.server.v1_12_R1.*;
+import org.bukkit.ChatColor;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class ItemUtil {
+
+    public ItemUtil() {
+    }
 
     public static final List<Item> illegals = Arrays.asList(
             Item.getById(7), //Bedrock
@@ -18,7 +22,10 @@ public class ItemUtil {
             Item.getById(211), //Chain Command Block
             Item.getById(210), //Repeating Command Block
             Item.getById(137), //Command Block
-            Item.getById(422) //Command Block Minecart
+            Item.getById(422), //Command Block Minecart
+            Item.getById(453), //Knowledge book
+            Item.getById(208), //Grass path
+            Item.getById(60) //Farmland
     );
     private static final List<Item> exempt = Arrays.asList(
             Item.getById(0), //Air
@@ -33,8 +40,13 @@ public class ItemUtil {
             Item.getById(358)
     );
 
-    public static boolean isUnobtainableItem(ItemStack item) {
-        return illegals.contains(item.getItem());
+    public static List<Item> getIllegals() {
+        return illegals;
+    }
+
+    public static boolean isUnobtainableItem(ItemStack itemStack) {
+        if (itemStack.getItem() instanceof ItemSkull && itemStack.hasTag() && itemStack.getTag().hasKey("SkullOwner")) return true;
+        return illegals.contains(itemStack.getItem());
     }
 
     public static boolean isOverstacked(ItemStack itemStack) {
@@ -42,7 +54,6 @@ public class ItemUtil {
     }
 
     public static boolean isHighDura(ItemStack itemStack) {
-        if (itemStack.hasTag() && itemStack.getTag().hasKey(""))
         if (exempt.contains(itemStack.getItem())) return false;
         return itemStack.getDamage() < 0 || itemStack.getDamage() > itemStack.getItem().getMaxDurability() && Item.getId(itemStack.getItem()) > 256;
     }
@@ -66,8 +77,58 @@ public class ItemUtil {
             short level = compound.getShort("lvl");
             Enchantment enchantment = Enchantment.c(compound.getShort("id"));
             if (level > enchantment.getMaxLevel()) return true;
-            if (!enchantment.canEnchant(itemStack)) return true;
+            if (!canEnchant(itemStack, enchantment)) return true;
         }
         return false;
+    }
+
+    public static boolean hasMeta(ItemStack itemStack) {
+        if (!hasTag(itemStack)) return false;
+        NBTTagCompound tag = itemStack.getTag();
+        if (!tag.hasKey("display")) return false;
+        NBTTagCompound display = tag.getCompound("display");
+        return display.hasKey("Lore");
+    }
+    public static boolean canEnchant(ItemStack itemStack, Enchantment enchantment) {
+        if (Item.getId(itemStack.getItem()) < 256) return false;
+        if (!itemStack.canEnchant()) return false;
+        if (!enchantment.canEnchant(itemStack)) return false;
+        return enchantment.itemTarget.canEnchant(itemStack.getItem());
+    }
+    public static boolean isUnbreakable(ItemStack itemStack) {
+        return itemStack.hasTag() && itemStack.getTag().hasKey("Unbreakable");
+    }
+
+    public static boolean hasHideFlags(ItemStack itemStack) {
+        return itemStack.hasTag() && itemStack.getTag().hasKey("HideFlags");
+    }
+    public static boolean hasInvalidBlockEntityTag(ItemStack itemStack) {
+        if (itemStack.getItem() instanceof ItemShulkerBox) return false;
+        if (!hasTag(itemStack)) return false;
+        return itemStack.getTag().hasKey("BlockEntityTag");
+    }
+    public static boolean hasInvalidName(ItemStack itemStack) {
+        if (!hasTag(itemStack)) return false;
+        NBTTagCompound tag = itemStack.getTag();
+        if (!tag.hasKey("display")) return false;
+        NBTTagCompound display = tag.getCompound("display");
+        if (!display.hasKey("Name")) return false;
+        String name = display.getString("Name");
+        if (name.length() > 16) return true;
+        return ChatColor.stripColor(name).length() != name.length();
+    }
+    public static boolean hasCustomPotionEffects(ItemStack itemStack) {
+        if (!hasTag(itemStack)) return false;
+        NBTTagCompound compound = itemStack.getTag();
+        return compound.hasKey("CustomPotionEffects");
+    }
+
+    public static boolean cantBeEnchanted(ItemStack itemStack) {
+        if (itemStack.getItem() instanceof ItemTool) return false;
+        if (itemStack.getItem() instanceof ItemSword) return false;
+        if (itemStack.getItem() instanceof ItemFlintAndSteel) return false;
+        if (itemStack.getItem() instanceof ItemElytra) return false;
+        if (itemStack.getItem() instanceof ItemBow) return false;
+        return !(itemStack.getItem() instanceof ItemArmor);
     }
 }
