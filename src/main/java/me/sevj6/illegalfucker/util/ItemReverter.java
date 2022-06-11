@@ -75,6 +75,9 @@ public class ItemReverter {
             else if (duration > 3) compound.setByte("Flight", (byte) 3);
             Utils.log("&3Reverted the flight duration of a firework with the duration &a%d", duration);
         }
+        if (hasConflictingEnchants(itemStack)) {
+            removeConflicting(itemStack);
+        }
     }
 
     private static void revertEnchantLevels(ItemStack itemStack) {
