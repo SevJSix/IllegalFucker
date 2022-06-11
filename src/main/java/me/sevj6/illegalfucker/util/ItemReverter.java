@@ -105,19 +105,19 @@ public class ItemReverter {
             NBTTagCompound enchTag = enchants.get(i);
             Enchantment key = Enchantment.c(enchTag.getShort("id"));
             if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, 17)
-                    || key.equals(Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS)
-                    || key.equals(Enchantment.DAMAGE_UNDEAD) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS)
-                    || key.equals(Enchantment.MENDING) && itemStack.containsEnchantment(Enchantment.ARROW_INFINITE)
-                    || key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE)
-                    || key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_FIRE)
-                    || key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS)
-                    || key.equals(Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS)
-                    || key.equals(Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE)
-                    || key.equals(Enchantment.PROTECTION_EXPLOSIONS) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE)
-                    || key.equals(Enchantment.LOOT_BONUS_BLOCKS) && itemStack.containsEnchantment(Enchantment.SILK_TOUCH)
-                    || isArmor(itemStack) && key.equals(Enchantment.VANISHING_CURSE) && itemStack.containsEnchantment(Enchantment.BINDING_CURSE)
-                    || (!isBoots(itemStack) && key.equals(Enchantment.PROTECTION_FALL))
-                    || isBoots(itemStack) && key.equals(Enchantment.DEPTH_STRIDER) && itemStack.containsEnchantment(Enchantment.FROST_WALKER))
+                    || Enchantment.getId(key) == 16 && containsEnchantment(enchants, 18)
+                    || Enchantment.getId(key) == 17 && containsEnchantment(enchants, 18)
+                    || Enchantment.getId(key) == 70 && containsEnchantment(enchants, 51)
+                    || Enchantment.getId(key) == 0 && containsEnchantment(enchants, 4)
+                    || Enchantment.getId(key) == 0 && containsEnchantment(enchants, 1)
+                    || Enchantment.getId(key) == 0 && containsEnchantment(enchants, 3)
+                    || Enchantment.getId(key) == 1 && containsEnchantment(enchants, 3)
+                    || Enchantment.getId(key) == 1 && containsEnchantment(enchants, 4)
+                    || Enchantment.getId(key) == 3 && containsEnchantment(enchants, 4)
+                    || Enchantment.getId(key) == 35 && containsEnchantment(enchants, 33)
+                    || isArmor(itemStack) && Enchantment.getId(key) == 71 && containsEnchantment(enchants, 10)
+                    || (!isBoots(itemStack) && Enchantment.getId(key) == 2)
+                    || isBoots(itemStack) && Enchantment.getId(key) == 8 && containsEnchantment(enchants, 9))
                 return true;
         }
         return false;
@@ -127,7 +127,10 @@ public class ItemReverter {
         return ench.list.stream().map(t -> (NBTTagCompound)t).anyMatch(c -> id == c.getShort("id"));
     }
 
-    public static void removeConflicting(org.bukkit.inventory.ItemStack itemStack) {
+    public static void removeConflicting(ItemStack itemStack) {
+        if (!ItemUtil.hasTag(itemStack)) return;
+        if (!itemStack.hasEnchantments()) return;
+        NBTTagList enchants = itemStack.getTag().getList("ench", 10);
         for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
             Enchantment key = entry.getKey();
             if (key.equals(Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(Enchantment.DAMAGE_UNDEAD))
