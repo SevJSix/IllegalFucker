@@ -2,9 +2,6 @@ package me.sevj6.illegalfucker.util;
 
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.ChatColor;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.Map;
 
 /**
  * @author 254n_m
@@ -104,30 +101,18 @@ public class ItemReverter {
         for (int i = 0; i < enchants.size(); i++) {
             NBTTagCompound enchTag = enchants.get(i);
             Enchantment key = Enchantment.c(enchTag.getShort("id"));
-            if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, 17)
-                    || Enchantment.getId(key) == 16 && containsEnchantment(enchants, 18)
-                    || Enchantment.getId(key) == 17 && containsEnchantment(enchants, 18)
-                    || Enchantment.getId(key) == 70 && containsEnchantment(enchants, 51)
-                    || Enchantment.getId(key) == 0 && containsEnchantment(enchants, 4)
-                    || Enchantment.getId(key) == 0 && containsEnchantment(enchants, 1)
-                    || Enchantment.getId(key) == 0 && containsEnchantment(enchants, 3)
-                    || Enchantment.getId(key) == 1 && containsEnchantment(enchants, 3)
-                    || Enchantment.getId(key) == 1 && containsEnchantment(enchants, 4)
-                    || Enchantment.getId(key) == 3 && containsEnchantment(enchants, 4)
-                    || Enchantment.getId(key) == 35 && containsEnchantment(enchants, 33)
-                    || isArmor(itemStack) && Enchantment.getId(key) == 71 && containsEnchantment(enchants, 10)
-                    || (!isBoots(itemStack) && Enchantment.getId(key) == 2)
-                    || isBoots(itemStack) && Enchantment.getId(key) == 8 && containsEnchantment(enchants, 9))
+            if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, 17) || Enchantment.getId(key) == 16 && containsEnchantment(enchants, 18) || Enchantment.getId(key) == 17 && containsEnchantment(enchants, 18) || Enchantment.getId(key) == 70 && containsEnchantment(enchants, 51) || Enchantment.getId(key) == 0 && containsEnchantment(enchants, 4) || Enchantment.getId(key) == 0 && containsEnchantment(enchants, 1) || Enchantment.getId(key) == 0 && containsEnchantment(enchants, 3) || Enchantment.getId(key) == 1 && containsEnchantment(enchants, 3) || Enchantment.getId(key) == 1 && containsEnchantment(enchants, 4) || Enchantment.getId(key) == 3 && containsEnchantment(enchants, 4) || Enchantment.getId(key) == 35 && containsEnchantment(enchants, 33) || isArmor(itemStack) && Enchantment.getId(key) == 71 && containsEnchantment(enchants, 10) || (!isBoots(itemStack) && Enchantment.getId(key) == 2) || isBoots(itemStack) && Enchantment.getId(key) == 8 && containsEnchantment(enchants, 9))
                 return true;
         }
         return false;
     }
 
     private static boolean containsEnchantment(NBTTagList ench, int id) {
-        return ench.list.stream().map(t -> (NBTTagCompound)t).anyMatch(c -> id == c.getShort("id"));
+        return ench.list.stream().map(t -> (NBTTagCompound) t).anyMatch(c -> id == c.getShort("id"));
     }
+
     private static void removeEnchantment(NBTTagList ench, int id) {
-        ench.list.stream().map(t -> (NBTTagCompound)t).filter(tag -> tag.getShort("id") == id).forEach(ench.list::remove);
+        ench.list.stream().map(t -> (NBTTagCompound) t).filter(tag -> tag.getShort("id") == id).forEach(ench.list::remove);
     }
 
     public static void removeConflicting(ItemStack itemStack) {
@@ -142,36 +127,43 @@ public class ItemReverter {
             }
             if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, 18)) {
                 removeEnchantment(enchants, 18);
-
             }
-        }
-        for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
-            Enchantment key = entry.getKey();
-
-            if (key.equals(Enchantment.DAMAGE_UNDEAD) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS))
-                itemStack.removeEnchantment(Enchantment.DAMAGE_ARTHROPODS);
-            if (key.equals(Enchantment.MENDING) && itemStack.containsEnchantment(Enchantment.ARROW_INFINITE))
-                itemStack.removeEnchantment(Enchantment.MENDING);
-            if (key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE))
-                itemStack.removeEnchantment(Enchantment.PROTECTION_PROJECTILE);
-            if (key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_FIRE))
-                itemStack.removeEnchantment(Enchantment.PROTECTION_FIRE);
-            if (key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS))
-                itemStack.removeEnchantment(Enchantment.PROTECTION_EXPLOSIONS);
-            if (key.equals(Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS))
-                itemStack.removeEnchantment(Enchantment.PROTECTION_EXPLOSIONS);
-            if (key.equals(Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE))
-                itemStack.removeEnchantment(Enchantment.PROTECTION_PROJECTILE);
-            if (key.equals(Enchantment.PROTECTION_EXPLOSIONS) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE))
-                itemStack.removeEnchantment(Enchantment.PROTECTION_PROJECTILE);
-            if (key.equals(Enchantment.LOOT_BONUS_BLOCKS) && itemStack.containsEnchantment(Enchantment.SILK_TOUCH))
-                itemStack.removeEnchantment(Enchantment.SILK_TOUCH);
-            if (isArmor(itemStack) && key.equals(Enchantment.VANISHING_CURSE) && itemStack.containsEnchantment(Enchantment.BINDING_CURSE))
-                itemStack.removeEnchantment(Enchantment.BINDING_CURSE);
-            if (isBoots(itemStack) && key.equals(Enchantment.PROTECTION_FALL))
-                itemStack.removeEnchantment(Enchantment.PROTECTION_FALL);
-            if (isBoots(itemStack) && key.equals(Enchantment.DEPTH_STRIDER) && itemStack.containsEnchantment(Enchantment.FROST_WALKER))
-                itemStack.removeEnchantment(Enchantment.FROST_WALKER);
+            if (Enchantment.getId(key) == 17 && containsEnchantment(enchants, 18)) {
+                removeEnchantment(enchants, 18);
+            }
+            if (Enchantment.getId(key) == 70 && containsEnchantment(enchants, 51)) {
+                removeEnchantment(enchants, 51);
+            }
+            if (Enchantment.getId(key) == 0 && containsEnchantment(enchants, 4)) {
+                removeEnchantment(enchants, 4);
+            }
+            if (Enchantment.getId(key) == 0 && containsEnchantment(enchants, 1)) {
+                removeEnchantment(enchants, 1);
+            }
+            if (Enchantment.getId(key) == 0 && containsEnchantment(enchants, 3)) {
+                removeEnchantment(enchants, 3);
+            }
+            if (Enchantment.getId(key) == 1 && containsEnchantment(enchants, 3)) {
+                removeEnchantment(enchants, 3);
+            }
+            if (Enchantment.getId(key) == 1 && containsEnchantment(enchants, 4)) {
+                removeEnchantment(enchants, 4);
+            }
+            if (Enchantment.getId(key) == 3 && containsEnchantment(enchants, 4)) {
+                removeEnchantment(enchants, 4);
+            }
+            if (Enchantment.getId(key) == 35 && containsEnchantment(enchants, 33)) {
+                removeEnchantment(enchants, 33);
+            }
+            if (isArmor(itemStack) && Enchantment.getId(key) == 71 && containsEnchantment(enchants, 10)) {
+                removeEnchantment(enchants, 10);
+            }
+            if (!isBoots(itemStack) && Enchantment.getId(key) == 2) {
+                removeEnchantment(enchants, 2);
+            }
+            if (isBoots(itemStack) && Enchantment.getId(key) == 8 && containsEnchantment(enchants, 9)) {
+                removeEnchantment(enchants, 9);
+            }
         }
     }
 
