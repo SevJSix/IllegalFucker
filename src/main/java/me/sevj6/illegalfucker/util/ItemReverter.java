@@ -97,63 +97,67 @@ public class ItemReverter {
         }
     }
 
-    public static boolean hasConflictingEnchants(org.bukkit.inventory.ItemStack itemStack) {
-        if (hasMeta(itemStack)) {
-            ItemMeta meta = itemStack.getItemMeta();
-            if (!meta.hasEnchants()) return false;
-            for (Map.Entry<org.bukkit.enchantments.Enchantment, Integer> entry : meta.getEnchants().entrySet()) {
-                org.bukkit.enchantments.Enchantment key = entry.getKey();
-                if (key.equals(org.bukkit.enchantments.Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD)
-                        || key.equals(org.bukkit.enchantments.Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_ARTHROPODS)
-                        || key.equals(org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_ARTHROPODS)
-                        || key.equals(org.bukkit.enchantments.Enchantment.MENDING) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.ARROW_INFINITE)
-                        || key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_PROJECTILE)
-                        || key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_FIRE)
-                        || key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_EXPLOSIONS)
-                        || key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_EXPLOSIONS)
-                        || key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_PROJECTILE)
-                        || key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_EXPLOSIONS) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_PROJECTILE)
-                        || key.equals(org.bukkit.enchantments.Enchantment.LOOT_BONUS_BLOCKS) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.SILK_TOUCH)
-                        || isArmor(itemStack) && key.equals(org.bukkit.enchantments.Enchantment.VANISHING_CURSE) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.BINDING_CURSE)
-                        || (!isBoots(itemStack) && key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_FALL))
-                        || isBoots(itemStack) && key.equals(org.bukkit.enchantments.Enchantment.DEPTH_STRIDER) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.FROST_WALKER))
-                    return true;
-            }
+    public static boolean hasConflictingEnchants(ItemStack itemStack) {
+        if (!ItemUtil.hasTag(itemStack)) return false;
+        if (!itemStack.hasEnchantments()) return false;
+        NBTTagList enchants = itemStack.getTag().getList("ench", 10);
+        for (int i = 0; i < enchants.size(); i++) {
+            NBTTagCompound enchTag = enchants.get(i);
+            Enchantment key = Enchantment.c(enchTag.getShort("id"));
+            if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, Enchantment.c(17))
+                    || key.equals(Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS)
+                    || key.equals(Enchantment.DAMAGE_UNDEAD) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS)
+                    || key.equals(Enchantment.MENDING) && itemStack.containsEnchantment(Enchantment.ARROW_INFINITE)
+                    || key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE)
+                    || key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_FIRE)
+                    || key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS)
+                    || key.equals(Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS)
+                    || key.equals(Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE)
+                    || key.equals(Enchantment.PROTECTION_EXPLOSIONS) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE)
+                    || key.equals(Enchantment.LOOT_BONUS_BLOCKS) && itemStack.containsEnchantment(Enchantment.SILK_TOUCH)
+                    || isArmor(itemStack) && key.equals(Enchantment.VANISHING_CURSE) && itemStack.containsEnchantment(Enchantment.BINDING_CURSE)
+                    || (!isBoots(itemStack) && key.equals(Enchantment.PROTECTION_FALL))
+                    || isBoots(itemStack) && key.equals(Enchantment.DEPTH_STRIDER) && itemStack.containsEnchantment(Enchantment.FROST_WALKER))
+                return true;
         }
         return false;
     }
 
+    private static boolean containsEnchantment(NBTTagList ench, Enchantment enchantment) {
+        return ench.list.stream().map(t -> (NBTTagCompound)t).anyMatch(c -> Enchantment.getId(enchantment) == c.getShort("id"));
+    }
+
     public static void removeConflicting(org.bukkit.inventory.ItemStack itemStack) {
-        for (Map.Entry<org.bukkit.enchantments.Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
-            org.bukkit.enchantments.Enchantment key = entry.getKey();
-            if (key.equals(org.bukkit.enchantments.Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD);
-            if (key.equals(org.bukkit.enchantments.Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_ARTHROPODS))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_ARTHROPODS);
-            if (key.equals(org.bukkit.enchantments.Enchantment.DAMAGE_UNDEAD) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_ARTHROPODS))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_ARTHROPODS);
-            if (key.equals(org.bukkit.enchantments.Enchantment.MENDING) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.ARROW_INFINITE))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.MENDING);
-            if (key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_PROJECTILE))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_PROJECTILE);
-            if (key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_FIRE))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_FIRE);
-            if (key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_EXPLOSIONS))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_EXPLOSIONS);
-            if (key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_EXPLOSIONS))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_EXPLOSIONS);
-            if (key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_PROJECTILE))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_PROJECTILE);
-            if (key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_EXPLOSIONS) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_PROJECTILE))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_PROJECTILE);
-            if (key.equals(org.bukkit.enchantments.Enchantment.LOOT_BONUS_BLOCKS) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.SILK_TOUCH))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.SILK_TOUCH);
-            if (isArmor(itemStack) && key.equals(org.bukkit.enchantments.Enchantment.VANISHING_CURSE) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.BINDING_CURSE))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.BINDING_CURSE);
-            if (isBoots(itemStack) && key.equals(org.bukkit.enchantments.Enchantment.PROTECTION_FALL))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.PROTECTION_FALL);
-            if (isBoots(itemStack) && key.equals(org.bukkit.enchantments.Enchantment.DEPTH_STRIDER) && itemStack.containsEnchantment(org.bukkit.enchantments.Enchantment.FROST_WALKER))
-                itemStack.removeEnchantment(org.bukkit.enchantments.Enchantment.FROST_WALKER);
+        for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
+            Enchantment key = entry.getKey();
+            if (key.equals(Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(Enchantment.DAMAGE_UNDEAD))
+                itemStack.removeEnchantment(Enchantment.DAMAGE_UNDEAD);
+            if (key.equals(Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS))
+                itemStack.removeEnchantment(Enchantment.DAMAGE_ARTHROPODS);
+            if (key.equals(Enchantment.DAMAGE_UNDEAD) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS))
+                itemStack.removeEnchantment(Enchantment.DAMAGE_ARTHROPODS);
+            if (key.equals(Enchantment.MENDING) && itemStack.containsEnchantment(Enchantment.ARROW_INFINITE))
+                itemStack.removeEnchantment(Enchantment.MENDING);
+            if (key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE))
+                itemStack.removeEnchantment(Enchantment.PROTECTION_PROJECTILE);
+            if (key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_FIRE))
+                itemStack.removeEnchantment(Enchantment.PROTECTION_FIRE);
+            if (key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS))
+                itemStack.removeEnchantment(Enchantment.PROTECTION_EXPLOSIONS);
+            if (key.equals(Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS))
+                itemStack.removeEnchantment(Enchantment.PROTECTION_EXPLOSIONS);
+            if (key.equals(Enchantment.PROTECTION_FIRE) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE))
+                itemStack.removeEnchantment(Enchantment.PROTECTION_PROJECTILE);
+            if (key.equals(Enchantment.PROTECTION_EXPLOSIONS) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE))
+                itemStack.removeEnchantment(Enchantment.PROTECTION_PROJECTILE);
+            if (key.equals(Enchantment.LOOT_BONUS_BLOCKS) && itemStack.containsEnchantment(Enchantment.SILK_TOUCH))
+                itemStack.removeEnchantment(Enchantment.SILK_TOUCH);
+            if (isArmor(itemStack) && key.equals(Enchantment.VANISHING_CURSE) && itemStack.containsEnchantment(Enchantment.BINDING_CURSE))
+                itemStack.removeEnchantment(Enchantment.BINDING_CURSE);
+            if (isBoots(itemStack) && key.equals(Enchantment.PROTECTION_FALL))
+                itemStack.removeEnchantment(Enchantment.PROTECTION_FALL);
+            if (isBoots(itemStack) && key.equals(Enchantment.DEPTH_STRIDER) && itemStack.containsEnchantment(Enchantment.FROST_WALKER))
+                itemStack.removeEnchantment(Enchantment.FROST_WALKER);
         }
     }
 
