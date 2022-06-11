@@ -105,7 +105,7 @@ public class ItemReverter {
             NBTTagCompound enchTag = enchants.get(i);
             Enchantment key = Enchantment.c(enchTag.getShort("id"));
             if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, 17)
-                    || Enchantment.getId(key) == 16 && containsEnchantment(enchants, Enchantment.c(18))
+                    || key.equals(Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS)
                     || key.equals(Enchantment.DAMAGE_UNDEAD) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS)
                     || key.equals(Enchantment.MENDING) && itemStack.containsEnchantment(Enchantment.ARROW_INFINITE)
                     || key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE)
@@ -123,8 +123,8 @@ public class ItemReverter {
         return false;
     }
 
-    private static boolean containsEnchantment(NBTTagList ench, Enchantment enchantment) {
-        return ench.list.stream().map(t -> (NBTTagCompound)t).anyMatch(c -> Enchantment.getId(enchantment) == c.getShort("id"));
+    private static boolean containsEnchantment(NBTTagList ench, int id) {
+        return ench.list.stream().map(t -> (NBTTagCompound)t).anyMatch(c -> id == c.getShort("id"));
     }
 
     public static void removeConflicting(org.bukkit.inventory.ItemStack itemStack) {
