@@ -45,7 +45,8 @@ public class ItemUtil {
     }
 
     public static boolean isUnobtainableItem(ItemStack itemStack) {
-        if (itemStack.getItem() instanceof ItemSkull && itemStack.hasTag() && itemStack.getTag().hasKey("SkullOwner")) return true;
+        if (itemStack.getItem() instanceof ItemSkull && itemStack.hasTag() && itemStack.getTag().hasKey("SkullOwner"))
+            return true;
         return illegals.contains(itemStack.getItem());
     }
 
@@ -89,12 +90,14 @@ public class ItemUtil {
         NBTTagCompound display = tag.getCompound("display");
         return display.hasKey("Lore");
     }
+
     public static boolean canEnchant(ItemStack itemStack, Enchantment enchantment) {
         if (Item.getId(itemStack.getItem()) < 256) return false;
         if (!itemStack.canEnchant()) return false;
         if (!enchantment.canEnchant(itemStack)) return false;
         return enchantment.itemTarget.canEnchant(itemStack.getItem());
     }
+
     public static boolean isUnbreakable(ItemStack itemStack) {
         return itemStack.hasTag() && itemStack.getTag().hasKey("Unbreakable");
     }
@@ -102,11 +105,13 @@ public class ItemUtil {
     public static boolean hasHideFlags(ItemStack itemStack) {
         return itemStack.hasTag() && itemStack.getTag().hasKey("HideFlags");
     }
+
     public static boolean hasInvalidBlockEntityTag(ItemStack itemStack) {
         if (itemStack.getItem() instanceof ItemShulkerBox) return false;
         if (!hasTag(itemStack)) return false;
         return itemStack.getTag().hasKey("BlockEntityTag");
     }
+
     public static boolean hasInvalidName(ItemStack itemStack) {
         if (!hasTag(itemStack)) return false;
         NBTTagCompound tag = itemStack.getTag();
@@ -117,6 +122,7 @@ public class ItemUtil {
         if (name.length() > 16) return true;
         return ChatColor.stripColor(name).length() != name.length();
     }
+
     public static boolean hasCustomPotionEffects(ItemStack itemStack) {
         if (!hasTag(itemStack)) return false;
         NBTTagCompound compound = itemStack.getTag();
@@ -130,5 +136,16 @@ public class ItemUtil {
         if (itemStack.getItem() instanceof ItemElytra) return false;
         if (itemStack.getItem() instanceof ItemBow) return false;
         return !(itemStack.getItem() instanceof ItemArmor);
+    }
+
+    public static boolean hasIllegalFlightDuration(ItemStack itemStack) {
+        if (!hasTag(itemStack)) return false;
+        if (!(itemStack.getItem() instanceof ItemFireworks)) return false;
+        if (itemStack.getTag() == null) return false;
+        NBTTagCompound compound = itemStack.getTag().getCompound("Fireworks");
+        if (compound == null) return false;
+        if (!compound.hasKey("Flight")) return false;
+        byte duration = compound.getByte("Flight");
+        return duration < 1 || duration > 3;
     }
 }
