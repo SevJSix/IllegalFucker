@@ -104,8 +104,8 @@ public class ItemReverter {
         for (int i = 0; i < enchants.size(); i++) {
             NBTTagCompound enchTag = enchants.get(i);
             Enchantment key = Enchantment.c(enchTag.getShort("id"));
-            if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, Enchantment.c(17))
-                    || key.equals(Enchantment.DAMAGE_ALL) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS)
+            if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, 17)
+                    || Enchantment.getId(key) == 16 && containsEnchantment(enchants, Enchantment.c(18))
                     || key.equals(Enchantment.DAMAGE_UNDEAD) && itemStack.containsEnchantment(Enchantment.DAMAGE_ARTHROPODS)
                     || key.equals(Enchantment.MENDING) && itemStack.containsEnchantment(Enchantment.ARROW_INFINITE)
                     || key.equals(Enchantment.PROTECTION_ENVIRONMENTAL) && itemStack.containsEnchantment(Enchantment.PROTECTION_PROJECTILE)
