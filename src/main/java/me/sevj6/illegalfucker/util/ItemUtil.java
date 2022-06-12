@@ -21,7 +21,8 @@ public class ItemUtil {
             Item.getById(422), //Command Block Minecart
             Item.getById(453), //Knowledge book
             Item.getById(208), //Grass path
-            Item.getById(60) //Farmland
+            Item.getById(60), //Farmland
+            Item.getById(31) //Shrubs
     );
     private static final List<Item> exempt = Arrays.asList(
             Item.getById(0), //Air
