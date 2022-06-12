@@ -104,7 +104,7 @@ public class ItemUtil {
     }
 
     public static boolean hasInvalidBlockEntityTag(ItemStack itemStack) {
-        if (itemStack.getItem() instanceof ItemShulkerBox) return false;
+        if (itemStack.getItem() instanceof ItemShulkerBox || itemStack.getItem() instanceof ItemBanner) return false;
         if (!hasTag(itemStack)) return false;
         return itemStack.getTag().hasKey("BlockEntityTag");
     }
