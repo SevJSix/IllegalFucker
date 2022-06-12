@@ -104,7 +104,7 @@ public class ItemUtil {
     }
 
     public static boolean hasInvalidBlockEntityTag(ItemStack itemStack) {
-        if (itemStack.getItem() instanceof ItemShulkerBox) return false;
+        if (itemStack.getItem() instanceof ItemShulkerBox || itemStack.getItem() instanceof ItemBanner) return false;
         if (!hasTag(itemStack)) return false;
         return itemStack.getTag().hasKey("BlockEntityTag");
     }
@@ -151,6 +151,16 @@ public class ItemUtil {
         byte duration = compound.getByte("Flight");
         return duration < 1 || duration > 3;
     }
+
+    public static boolean hasMapColorTag(ItemStack itemStack) {
+        if (!hasTag(itemStack)) return false;
+        if (!(itemStack.getItem() instanceof ItemWorldMap)) return false;
+        NBTTagCompound compound = itemStack.getTag();
+        if (!compound.hasKey("display")) return false;
+        NBTTagCompound display = compound.getCompound("display");
+        return display.hasKey("MapColor");
+    }
+
     public static boolean hasConflictingEnchants(ItemStack itemStack) {
         if (!ItemUtil.hasTag(itemStack)) return false;
         NBTTagList enchants = (NBTTagList) ((itemStack.getTag().hasKey("ench")) ? itemStack.getTag().get("ench") : itemStack.getTag().get("StoredEnchantments"));

@@ -86,6 +86,9 @@ public class ItemReverter {
             else if (duration > 3) compound.setByte("Flight", (byte) 3);
             Utils.log("&3Reverted the flight duration of a firework with the duration &a%d", duration);
         }
+        if (ItemUtil.hasMapColorTag(itemStack)) {
+            itemStack.getTag().getCompound("display").remove("MapColor");
+        }
     }
 
     private static void revertEnchants(ItemStack itemStack) {
