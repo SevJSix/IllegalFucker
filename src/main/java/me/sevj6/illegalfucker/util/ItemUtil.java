@@ -135,6 +135,7 @@ public class ItemUtil {
         if (itemStack.getItem() instanceof ItemTool) return false;
         if (itemStack.getItem() instanceof ItemSword) return false;
         if (itemStack.getItem() instanceof ItemFlintAndSteel) return false;
+        if (itemStack.getItem() instanceof ItemShears) return false;
         if (itemStack.getItem() instanceof ItemElytra) return false;
         if (itemStack.getItem() instanceof ItemBow) return false;
         return !(itemStack.getItem() instanceof ItemArmor);
