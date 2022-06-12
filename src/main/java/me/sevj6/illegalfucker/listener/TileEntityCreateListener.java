@@ -1,6 +1,7 @@
 package me.sevj6.illegalfucker.listener;
 
 import me.txmc.paperapiextentions.events.TileEntityCreateEvent;
+import me.txmc.paperapiextentions.mixin.mixins.MixinTileEntity;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;

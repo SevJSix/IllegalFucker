@@ -40,6 +40,9 @@ public class ItemReverter {
                 }
             }
         }
+        if (ItemUtil.hasConflictingEnchants(itemStack)) {
+            itemStack.getTag().remove("ench");
+        }
         if (ItemUtil.hasIllegalEnchants(itemStack)) {
             revertEnchantLevels(itemStack);
         }
@@ -90,102 +93,6 @@ public class ItemReverter {
                 compound.setShort("lvl", (short) enchantment.getMaxLevel());
                 Utils.log("&3Reverted enchant&r&a %s&r&3 from level&r&a %d&r&3 to&r&a %d&r", enchantment.a(), level, enchantment.getMaxLevel());
             }
-            if (hasConflictingEnchants(itemStack)) {
-                itemStack.getTag().remove("ench");
-            }
         }
-    }
-
-    public static boolean hasConflictingEnchants(ItemStack itemStack) {
-        if (!ItemUtil.hasTag(itemStack)) return false;
-        if (!itemStack.hasEnchantments()) return false;
-        NBTTagList enchants = itemStack.getTag().getList("ench", 10);
-        for (int i = 0; i < enchants.size(); i++) {
-            NBTTagCompound enchTag = enchants.get(i);
-            Enchantment key = Enchantment.c(enchTag.getShort("id"));
-            if (
-                            Enchantment.getId(key) == 16 && containsEnchantment(enchants, 17) ||
-                            Enchantment.getId(key) == 16 && containsEnchantment(enchants, 18) ||
-                            Enchantment.getId(key) == 17 && containsEnchantment(enchants, 18) ||
-                            Enchantment.getId(key) == 70 && containsEnchantment(enchants, 51) ||
-                            Enchantment.getId(key) == 0 && containsEnchantment(enchants, 4) ||
-                            Enchantment.getId(key) == 0 && containsEnchantment(enchants, 1) ||
-                            Enchantment.getId(key) == 0 && containsEnchantment(enchants, 3) ||
-                            Enchantment.getId(key) == 1 && containsEnchantment(enchants, 3) ||
-                            Enchantment.getId(key) == 1 && containsEnchantment(enchants, 4) ||
-                            Enchantment.getId(key) == 3 && containsEnchantment(enchants, 4) ||
-                            Enchantment.getId(key) == 35 && containsEnchantment(enchants, 33) ||
-                            isArmor(itemStack) && Enchantment.getId(key) == 71 && containsEnchantment(enchants, 10))
-                return true;
-        }
-        return false;
-    }
-
-    private static boolean containsEnchantment(NBTTagList ench, int id) {
-        return ench.list.stream().map(t -> (NBTTagCompound) t).anyMatch(c -> id == c.getShort("id"));
-    }
-//
-//    private static void removeEnchantment(NBTTagList ench, int id) {
-//        ench.list.stream().map(t -> (NBTTagCompound) t).filter(Objects::nonNull).filter(t -> t.hasKey("id")).filter(tag -> tag.getShort("id") == id).forEach(ench.list::remove);
-//    }
-
-//    public static void removeConflicting(ItemStack itemStack) {
-//        if (!ItemUtil.hasTag(itemStack)) return;
-//        if (!itemStack.hasEnchantments()) return;
-//        NBTTagList enchants = itemStack.getTag().getList("ench", 10);
-//        for (int i = 0; i < enchants.size(); i++) {
-//            NBTTagCompound compound = enchants.get(i);
-//            Enchantment key = Enchantment.c(compound.getShort("id"));
-//            if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, 17)) {
-//                removeEnchantment(enchants, 17);
-//            }
-//            if (Enchantment.getId(key) == 16 && containsEnchantment(enchants, 18)) {
-//                removeEnchantment(enchants, 18);
-//            }
-//            if (Enchantment.getId(key) == 17 && containsEnchantment(enchants, 18)) {
-//                removeEnchantment(enchants, 18);
-//            }
-//            if (Enchantment.getId(key) == 70 && containsEnchantment(enchants, 51)) {
-//                removeEnchantment(enchants, 51);
-//            }
-//            if (Enchantment.getId(key) == 0 && containsEnchantment(enchants, 4)) {
-//                removeEnchantment(enchants, 4);
-//            }
-//            if (Enchantment.getId(key) == 0 && containsEnchantment(enchants, 1)) {
-//                removeEnchantment(enchants, 1);
-//            }
-//            if (Enchantment.getId(key) == 0 && containsEnchantment(enchants, 3)) {
-//                removeEnchantment(enchants, 3);
-//            }
-//            if (Enchantment.getId(key) == 1 && containsEnchantment(enchants, 3)) {
-//                removeEnchantment(enchants, 3);
-//            }
-//            if (Enchantment.getId(key) == 1 && containsEnchantment(enchants, 4)) {
-//                removeEnchantment(enchants, 4);
-//            }
-//            if (Enchantment.getId(key) == 3 && containsEnchantment(enchants, 4)) {
-//                removeEnchantment(enchants, 4);
-//            }
-//            if (Enchantment.getId(key) == 35 && containsEnchantment(enchants, 33)) {
-//                removeEnchantment(enchants, 33);
-//            }
-//            if (isArmor(itemStack) && Enchantment.getId(key) == 71 && containsEnchantment(enchants, 10)) {
-//                removeEnchantment(enchants, 10);
-//            }
-//            if (!isBoots(itemStack) && Enchantment.getId(key) == 2) {
-//                removeEnchantment(enchants, 2);
-//            }
-//            if (isBoots(itemStack) && Enchantment.getId(key) == 8 && containsEnchantment(enchants, 9)) {
-//                removeEnchantment(enchants, 9);
-//            }
-//        }
-//    }
-
-    public static boolean isArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ItemArmor || itemStack.getItem() instanceof ItemElytra;
-    }
-
-    public static boolean isBoots(ItemStack itemStack) {
-        return itemStack.getItem().getName().contains("_boots");
     }
 }

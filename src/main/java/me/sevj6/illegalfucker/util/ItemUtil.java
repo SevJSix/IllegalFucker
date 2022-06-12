@@ -148,4 +148,35 @@ public class ItemUtil {
         byte duration = compound.getByte("Flight");
         return duration < 1 || duration > 3;
     }
+    public static boolean hasConflictingEnchants(ItemStack itemStack) {
+        if (!ItemUtil.hasTag(itemStack)) return false;
+        if (!itemStack.hasEnchantments()) return false;
+        NBTTagList enchants = itemStack.getTag().getList("ench", 10);
+        for (int i = 0; i < enchants.size(); i++) {
+            NBTTagCompound enchTag = enchants.get(i);
+            Enchantment key = Enchantment.c(enchTag.getShort("id"));
+            if (
+                    Enchantment.getId(key) == 16 && containsEnchantment(enchants, 17) ||
+                            Enchantment.getId(key) == 16 && containsEnchantment(enchants, 18) ||
+                            Enchantment.getId(key) == 17 && containsEnchantment(enchants, 18) ||
+                            Enchantment.getId(key) == 70 && containsEnchantment(enchants, 51) ||
+                            Enchantment.getId(key) == 0 && containsEnchantment(enchants, 4) ||
+                            Enchantment.getId(key) == 0 && containsEnchantment(enchants, 1) ||
+                            Enchantment.getId(key) == 0 && containsEnchantment(enchants, 3) ||
+                            Enchantment.getId(key) == 1 && containsEnchantment(enchants, 3) ||
+                            Enchantment.getId(key) == 1 && containsEnchantment(enchants, 4) ||
+                            Enchantment.getId(key) == 3 && containsEnchantment(enchants, 4) ||
+                            Enchantment.getId(key) == 35 && containsEnchantment(enchants, 33) ||
+                            isArmor(itemStack) && Enchantment.getId(key) == 71 && containsEnchantment(enchants, 10))
+                return true;
+        }
+        return false;
+    }
+
+    private static boolean containsEnchantment(NBTTagList ench, int id) {
+        return ench.list.stream().map(t -> (NBTTagCompound) t).anyMatch(c -> id == c.getShort("id"));
+    }
+    public static boolean isArmor(ItemStack itemStack) {
+        return itemStack.getItem() instanceof ItemArmor || itemStack.getItem() instanceof ItemElytra;
+    }
 }
