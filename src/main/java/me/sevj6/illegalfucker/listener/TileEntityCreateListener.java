@@ -21,6 +21,7 @@ public class TileEntityCreateListener implements Listener {
         compound.setString("CustomName", name);
         if (event.getType().equals(TileEntityShulkerBox.class)) {
             NBTTagList items = (NBTTagList) compound.get("Items");
+            if (items == null) return;
             for (NBTTagCompound itemComp : items.list.stream().map(t -> (NBTTagCompound)t).collect(Collectors.toList())) {
                 Item item = itemComp.hasKeyOfType("id", 8) ? Item.b(itemComp.getString("id")) : Item.getItemOf(Blocks.AIR);
                 if (item instanceof ItemShulkerBox) itemComp.setString("id", "minecraft:air");
