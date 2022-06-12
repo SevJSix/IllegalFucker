@@ -4,6 +4,7 @@ import me.sevj6.illegalfucker.util.ItemReverter;
 import me.sevj6.illegalfucker.util.ItemUtil;
 import me.sevj6.illegalfucker.util.Utils;
 import me.txmc.paperapiextentions.events.ItemStackCreateEvent;
+import me.txmc.paperapiextentions.mixin.mixins.MixinTileEntity;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

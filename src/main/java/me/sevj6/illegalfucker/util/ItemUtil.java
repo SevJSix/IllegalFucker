@@ -83,6 +83,19 @@ public class ItemUtil {
         return false;
     }
 
+    public static boolean isIllegalEnchantedBook(ItemStack itemStack) {
+        if (!ItemUtil.hasTag(itemStack)) return false;
+        NBTTagCompound compound = itemStack.getTag();
+        if (!compound.hasKey("StoredEnchantments")) return false;
+        NBTTagList enchants = (NBTTagList) compound.get("StoredEnchantments");
+        for (NBTTagCompound comp : enchants.list.stream().map(t -> (NBTTagCompound) t).toArray(NBTTagCompound[]::new)) {
+            short level = comp.getShort("lvl");
+            Enchantment enchantment = Enchantment.c(comp.getShort("id"));
+            if (level > enchantment.getMaxLevel()) return true;
+        }
+        return false;
+    }
+
     public static boolean hasMeta(ItemStack itemStack) {
         if (!hasTag(itemStack)) return false;
         NBTTagCompound tag = itemStack.getTag();
@@ -127,6 +140,11 @@ public class ItemUtil {
         if (!hasTag(itemStack)) return false;
         NBTTagCompound compound = itemStack.getTag();
         return compound.hasKey("CustomPotionEffects");
+    }
+
+    public static boolean hasCustomPotionColor(ItemStack itemStack) {
+        if (!hasTag(itemStack)) return false;
+        return itemStack.getTag().hasKey("CustomPotionColor");
     }
 
     public static boolean cantBeEnchanted(ItemStack itemStack) {
