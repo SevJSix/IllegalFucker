@@ -7,10 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ItemUtil {
-
-    public ItemUtil() {
-    }
-
     public static final List<Item> illegals = Arrays.asList(
             Item.getById(7), //Bedrock
             Item.getById(166), //Barrier
@@ -73,25 +69,13 @@ public class ItemUtil {
     public static boolean hasIllegalEnchants(ItemStack itemStack) {
         if (!hasTag(itemStack)) return false;
         if (!itemStack.hasEnchantments()) return false;
-        NBTTagList enchants = itemStack.getEnchantments();
+        NBTTagList enchants = (NBTTagList) ((itemStack.getTag().hasKey("ench")) ? itemStack.getTag().get("ench") : itemStack.getTag().get("StoredEnchantments"));
         for (NBTTagCompound compound : enchants.list.stream().map(t -> (NBTTagCompound) t).toArray(NBTTagCompound[]::new)) {
             short level = compound.getShort("lvl");
             Enchantment enchantment = Enchantment.c(compound.getShort("id"));
+            if (level <= 0) return true;
             if (level > enchantment.getMaxLevel()) return true;
             if (!canEnchant(itemStack, enchantment)) return true;
-        }
-        return false;
-    }
-
-    public static boolean isIllegalEnchantedBook(ItemStack itemStack) {
-        if (!ItemUtil.hasTag(itemStack)) return false;
-        NBTTagCompound compound = itemStack.getTag();
-        if (!compound.hasKey("StoredEnchantments")) return false;
-        NBTTagList enchants = (NBTTagList) compound.get("StoredEnchantments");
-        for (NBTTagCompound comp : enchants.list.stream().map(t -> (NBTTagCompound) t).toArray(NBTTagCompound[]::new)) {
-            short level = comp.getShort("lvl");
-            Enchantment enchantment = Enchantment.c(comp.getShort("id"));
-            if (level > enchantment.getMaxLevel()) return true;
         }
         return false;
     }
@@ -168,8 +152,8 @@ public class ItemUtil {
     }
     public static boolean hasConflictingEnchants(ItemStack itemStack) {
         if (!ItemUtil.hasTag(itemStack)) return false;
-        if (!itemStack.hasEnchantments()) return false;
-        NBTTagList enchants = itemStack.getTag().getList("ench", 10);
+        NBTTagList enchants = (NBTTagList) ((itemStack.getTag().hasKey("ench")) ? itemStack.getTag().get("ench") : itemStack.getTag().get("StoredEnchantments"));
+        if (enchants == null) return false;
         for (int i = 0; i < enchants.size(); i++) {
             NBTTagCompound enchTag = enchants.get(i);
             Enchantment key = Enchantment.c(enchTag.getShort("id"));

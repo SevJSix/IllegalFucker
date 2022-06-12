@@ -1,10 +1,10 @@
 package me.sevj6.illegalfucker.util;
 
-import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.Enchantment;
+import net.minecraft.server.v1_12_R1.ItemStack;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
+import net.minecraft.server.v1_12_R1.NBTTagList;
 import org.bukkit.ChatColor;
-
-import java.util.Iterator;
-import java.util.stream.Collectors;
 
 /**
  * @author 254n_m
@@ -40,11 +40,16 @@ public class ItemReverter {
                 }
             }
         }
+
         if (ItemUtil.hasConflictingEnchants(itemStack)) {
-            itemStack.getTag().remove("ench");
+            if (itemStack.getTag().hasKey("StoredEnchantments")) {
+                itemStack.setCount(-1);
+            } else {
+                itemStack.getTag().hasKey("ench");
+            }
         }
         if (ItemUtil.hasIllegalEnchants(itemStack)) {
-            revertEnchantLevels(itemStack);
+            revertEnchants(itemStack);
         }
         if (ItemUtil.hasCustomPotionEffects(itemStack)) {
             itemStack.getTag().remove("CustomPotionEffects");
@@ -83,13 +88,17 @@ public class ItemReverter {
         }
     }
 
-    private static void revertEnchantLevels(ItemStack itemStack) {
-        NBTTagList enchants = itemStack.getEnchantments();
+    private static void revertEnchants(ItemStack itemStack) {
+        NBTTagList enchants = (NBTTagList) ((itemStack.getTag().hasKey("ench")) ? itemStack.getTag().get("ench") : itemStack.getTag().get("StoredEnchantments"));
+        if (enchants == null) return;
         for (int i = 0; i < enchants.size(); i++) {
             NBTTagCompound compound = enchants.get(i);
             short level = compound.getShort("lvl");
             Enchantment enchantment = Enchantment.c(compound.getShort("id"));
-            if (level > enchantment.getMaxLevel()) {
+            if (level <= 0) {
+                compound.setShort("lvl", (short) 1);
+                Utils.log("&3Reverted enchant&r&a %s&r&3 from level&r&a %d&r&3 to&r&a %d&r", enchantment.a(), level, enchantment.getMaxLevel());
+            } else if (level > enchantment.getMaxLevel()) {
                 compound.setShort("lvl", (short) enchantment.getMaxLevel());
                 Utils.log("&3Reverted enchant&r&a %s&r&3 from level&r&a %d&r&3 to&r&a %d&r", enchantment.a(), level, enchantment.getMaxLevel());
             }
