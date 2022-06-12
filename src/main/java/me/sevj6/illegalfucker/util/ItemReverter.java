@@ -44,8 +44,8 @@ public class ItemReverter {
         if (ItemUtil.hasConflictingEnchants(itemStack)) {
             if (itemStack.getTag().hasKey("StoredEnchantments")) {
                 itemStack.setCount(-1);
-            } else {
-                itemStack.getTag().hasKey("ench");
+            } else if (itemStack.getTag().hasKey("ench")) {
+                itemStack.getTag().remove("ench");
             }
         }
         if (ItemUtil.hasIllegalEnchants(itemStack)) {
